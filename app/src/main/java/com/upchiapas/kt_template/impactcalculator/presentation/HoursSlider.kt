@@ -15,6 +15,13 @@ fun HoursSlider(
     hours: Float,
     onHoursChanged: (Float) -> Unit
 ) {
+    // Formato visual legible para el usuario
+    val hoursFormatted = when {
+        hours < 1f -> "30 min"
+        hours % 1f == 0f -> "${hours.toInt()} hr${if (hours > 1f) "s" else ""}"
+        else -> "${hours.toInt()} hr 30 min"
+    }
+
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -26,16 +33,20 @@ fun HoursSlider(
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = "2. Horas diarias de uso: ${hours.roundToInt()} hrs",
+                text = "2. Horas diarias de uso: $hoursFormatted",
                 style = MaterialTheme.typography.titleMedium
             )
         }
         Spacer(modifier = Modifier.height(4.dp))
         Slider(
             value = hours,
-            onValueChange = onHoursChanged,
-            valueRange = 1f..12f,
-            steps = 10
+            onValueChange = { newValue ->
+                // Redondear a intervalos exactos de 0.5 (30 minutos)
+                val stepValue = (newValue * 2).roundToInt() / 2f
+                onHoursChanged(stepValue)
+            },
+            valueRange = 0.5f..7f,
+            steps = 12 // 12 pasos intermedios entre 0.5 y 7.0
         )
     }
 }

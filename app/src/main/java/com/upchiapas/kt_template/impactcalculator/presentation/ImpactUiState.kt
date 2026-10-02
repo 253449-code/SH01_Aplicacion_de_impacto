@@ -15,11 +15,10 @@ enum class ContentType(val displayName: String, val multiplier: Float) {
 
 data class ImpactUiState(
     val selectedNetwork: SocialNetwork = SocialNetwork.TIKTOK,
-    val dailyHours: Float = 2f,
+    val dailyHours: Float = 1.0f, // Valor inicial ajustado a 1 hora
     val selectedContent: ContentType = ContentType.ENTERTAINMENT,
-    val isWeekend: Boolean = false, // <--- Propiedad que faltaba
+    val isWeekend: Boolean = false,
 
-    // Métricas calculadas
     val harmfulDopamineScore: Int = 0,
     val healthyDopamineScore: Int = 0,
     val weeklyHarmfulHours: Float = 0f,

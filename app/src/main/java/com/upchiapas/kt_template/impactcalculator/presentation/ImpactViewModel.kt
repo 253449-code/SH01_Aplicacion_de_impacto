@@ -30,9 +30,13 @@ class ImpactViewModel : ViewModel() {
         calculateImpact()
     }
 
-    // <--- Función que faltaba
     fun onWeekendToggleChanged(isWeekend: Boolean) {
         _uiState.update { it.copy(isWeekend = isWeekend) }
+        calculateImpact()
+    }
+
+    fun onResetClicked() {
+        _uiState.value = ImpactUiState()
         calculateImpact()
     }
 
@@ -48,10 +52,30 @@ class ImpactViewModel : ViewModel() {
         val isDanger = harmfulScore > 500
         val levelText = if (isDanger) "Nivel Crítico: Riesgo alto de adicción digital" else "Nivel Moderado: Consumo dentro de rangos manejables"
 
+        // Texto descriptivo del tiempo para las sugerencias
+        val timeLabel = when {
+            currentState.dailyHours == 0.5f -> "30 minutos"
+            currentState.dailyHours == 1.0f -> "1 hora"
+            currentState.dailyHours % 1.0f == 0f -> "${currentState.dailyHours.toInt()} horas"
+            else -> "${currentState.dailyHours.toInt()} horas y media"
+        }
+
+        // Recomendaciones dinámicas según tiempo, dopamina saludable y nivel de riesgo
         val suggestion = when {
-            currentState.dailyHours > 4 -> "Inviertes ${weeklyHours.toInt()}h a la semana. Podrías dominar una habilidad técnica o entrenar diariamente."
-            currentState.isWeekend -> "Es fin de semana: aprovecha para hacer actividades al aire libre y desconectarte."
-            else -> "Sustituye este tiempo por 30 minutos de lectura o meditación."
+            currentState.dailyHours <= 1.0f ->
+                "En $timeLabel puedes hacer ejercicio ligero o salir a caminar para obtener $healthyScore pts de dopamina saludable, cuidando tu salud cardiovascular y previniendo enfermedades."
+
+            currentState.dailyHours <= 2.5f && !isDanger ->
+                "En $timeLabel podrías leer un libro o aprender un idioma para generar $healthyScore pts de dopamina saludable, fortaleciendo tu memoria y capacidad de concentración."
+
+            currentState.dailyHours <= 2.5f && isDanger ->
+                "Consumo intenso: En $timeLabel podrías realizar una rutina de ejercicio fuerte o meditación para liberar $healthyScore pts de dopamina saludable, reduciendo el estrés y desintoxicando tu mente."
+
+            currentState.dailyHours <= 4.5f ->
+                "Inviertes $timeLabel diarios (${weeklyHours.toInt()}h/semana). En este tiempo podrías entrenar un deporte o dominar una habilidad técnica y ganar $healthyScore pts de dopamina saludable, mejorando tu rendimiento físico e intelectual."
+
+            else ->
+                "Alerta de tiempo crítico: En $timeLabel podrías avanzar proyectos personales o realizar un entrenamiento físico completo, acumulando $healthyScore pts de dopamina saludable, fortaleciendo tu autoestima y recuperando horas valiosas de vida."
         }
 
         _uiState.update {

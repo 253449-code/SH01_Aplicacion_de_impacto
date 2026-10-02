@@ -29,7 +29,6 @@ fun ImpactPage(viewModel: ImpactViewModel = viewModel()) {
             color = MaterialTheme.colorScheme.primary
         )
 
-        // Composables invocados desde sus respectivos archivos
         NetworkSelector(
             selectedNetwork = uiState.selectedNetwork,
             onNetworkSelected = { viewModel.onNetworkSelected(it) }
@@ -51,5 +50,10 @@ fun ImpactPage(viewModel: ImpactViewModel = viewModel()) {
         )
 
         ImpactResultCard(uiState = uiState)
+
+        // Nuevo componente de reinicio
+        ResetButton(
+            onResetClicked = { viewModel.onResetClicked() }
+        )
     }
 }
