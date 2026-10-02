@@ -30,24 +30,35 @@ class ImpactViewModel : ViewModel() {
         calculateImpact()
     }
 
+    // <--- Función que faltaba
+    fun onWeekendToggleChanged(isWeekend: Boolean) {
+        _uiState.update { it.copy(isWeekend = isWeekend) }
+        calculateImpact()
+    }
+
     private fun calculateImpact() {
         val currentState = _uiState.value
+
+        val weekendMultiplier = if (currentState.isWeekend) 1.25f else 1.0f
         val baseScore = currentState.dailyHours * 100
-        val harmfulScore = (baseScore * currentState.selectedNetwork.dopamineMultiplier * currentState.selectedContent.multiplier).toInt()
-        val healthyScore = (baseScore * 1.5).toInt()
+        val harmfulScore = (baseScore * currentState.selectedNetwork.dopamineMultiplier * currentState.selectedContent.multiplier * weekendMultiplier).toInt()
+        val healthyScore = (baseScore * 1.5f).toInt()
+        val weeklyHours = currentState.dailyHours * 7f
 
         val isDanger = harmfulScore > 500
-        val levelText = if (isDanger) "Nivel Crítico: Riesgo de sobrecarga" else "Nivel Moderado: Consumo estable"
+        val levelText = if (isDanger) "Nivel Crítico: Riesgo alto de adicción digital" else "Nivel Moderado: Consumo dentro de rangos manejables"
 
         val suggestion = when {
-            currentState.dailyHours > 4 -> "Usa estas ${currentState.dailyHours.toInt()}h para ejercicio físico o aprender una habilidad."
-            else -> "Sustituye este tiempo por lectura o meditación."
+            currentState.dailyHours > 4 -> "Inviertes ${weeklyHours.toInt()}h a la semana. Podrías dominar una habilidad técnica o entrenar diariamente."
+            currentState.isWeekend -> "Es fin de semana: aprovecha para hacer actividades al aire libre y desconectarte."
+            else -> "Sustituye este tiempo por 30 minutos de lectura o meditación."
         }
 
         _uiState.update {
             it.copy(
                 harmfulDopamineScore = harmfulScore,
                 healthyDopamineScore = healthyScore,
+                weeklyHarmfulHours = weeklyHours,
                 impactLevelText = levelText,
                 suggestedActivity = suggestion,
                 isDangerLevel = isDanger

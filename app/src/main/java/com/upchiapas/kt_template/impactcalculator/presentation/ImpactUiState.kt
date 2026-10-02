@@ -17,8 +17,12 @@ data class ImpactUiState(
     val selectedNetwork: SocialNetwork = SocialNetwork.TIKTOK,
     val dailyHours: Float = 2f,
     val selectedContent: ContentType = ContentType.ENTERTAINMENT,
+    val isWeekend: Boolean = false, // <--- Propiedad que faltaba
+
+    // Métricas calculadas
     val harmfulDopamineScore: Int = 0,
     val healthyDopamineScore: Int = 0,
+    val weeklyHarmfulHours: Float = 0f,
     val impactLevelText: String = "",
     val suggestedActivity: String = "",
     val isDangerLevel: Boolean = false
